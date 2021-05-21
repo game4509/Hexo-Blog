@@ -170,7 +170,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2021-05-21 14:38:26 / Modified: 15:30:43" itemprop="dateCreated datePublished" datetime="2021-05-21T14:38:26+08:00">2021-05-21</time>
+              <time title="Created: 2021-05-21 14:38:26 / Modified: 15:40:56" itemprop="dateCreated datePublished" datetime="2021-05-21T14:38:26+08:00">2021-05-21</time>
             </span>
 
           
@@ -184,27 +184,15 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="raspberry-pi’s-os-reconstruction"><a href="#raspberry-pi’s-os-reconstruction" class="headerlink" title="raspberry pi’s os reconstruction"></a>raspberry pi’s os reconstruction</h2><p>In view of the raspberry pi is getting slower and also there are lots of files and apps from the last person who uses this pi before me, I decided to rebuild the os and start to try some features of pi, though there are small things stucked me in.<br>I have some ideas to do with pi, like also deploy my blog on my pi as a server and at the same time I could try building my own DNS server. I’m kinda new in this area, it’s time to practice networking. After this, maybe I’ll do NAS or similar network filesystem for convenience and practicing. </p>
-<h2 id="raspberry-pi’s-setting-progress-and-notes"><a href="#raspberry-pi’s-setting-progress-and-notes" class="headerlink" title="raspberry pi’s setting progress and notes"></a>raspberry pi’s setting progress and notes</h2><h3 id="raspberry-pi-imager"><a href="#raspberry-pi-imager" class="headerlink" title="raspberry pi imager"></a>raspberry pi imager</h3><p>Just an action to install os into sd card. Since I have used SSD for my desktop, I feel so slow with sd card, apt upgrade took like an hour to finish.</p>
-<h3 id="user-settings"><a href="#user-settings" class="headerlink" title="user settings"></a>user settings</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">adduser newuser</span><br><span class="line"></span><br><span class="line">adduser newuser sudo</span><br><span class="line"><span class="meta">#</span><span class="bash">or</span></span><br><span class="line">usermod -aG sudo newuser</span><br></pre></td></tr></table></figure>
-<p>Add a newuser for ssh remote login.<br>The second line is making this newuser sudo-permission.</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">groups</span><br><span class="line">groups newuser</span><br><span class="line">id newuser</span><br></pre></td></tr></table></figure>
-<p>Check the status of group and id.<br>If newuser has sudo-permission, he’ll be in the “sudo” group.</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">su - newuser</span><br></pre></td></tr></table></figure>
-<p>You can check if newuser can use commands with sudo by switching into newuser account.</p>
-<h3 id="network-settings-no-GUI"><a href="#network-settings-no-GUI" class="headerlink" title="network settings(no GUI)"></a>network settings(no GUI)</h3><p>Without any GUI you can use, we should set up the network options by configuring with netplan.<br>There is a file under ==/etc/netplan==. For me, it’s ==/etc/netplan/50-cloud-init.yaml==. There are lots of options in the example.</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">network:</span><br><span class="line">    ethernets:</span><br><span class="line">        eth0:</span><br><span class="line">            dhcp4: true</span><br><span class="line">            optional: true</span><br><span class="line">    version: 2</span><br><span class="line">    wifis:</span><br><span class="line">        wlan0:</span><br><span class="line">            dhcp4: no</span><br><span class="line">            addresses: [192.168.0.110/24]</span><br><span class="line">            gateway4: 192.168.0.1</span><br><span class="line">            access-points:</span><br><span class="line">                &quot;WIFIAP-SSID&quot;:</span><br><span class="line">                    password: &quot;PASSWORD&quot;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>This is my configuration. From top, ethernets uses eth0 interface and without settings. And wifi uses wlan0 as interface, I’ve given an exact ipv4 address for it and also my router gateway, the wifi ssid I want to connect is “WIFIAP-SSID” and the password should be provided. </p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sudo netplan apply</span><br><span class="line"><span class="meta">#</span><span class="bash">Check the ip address</span></span><br><span class="line">ip a</span><br><span class="line">ifconfig</span><br></pre></td></tr></table></figure>
-<p>Wifi connected right after applying settings.<br>P.S. you may get lots of wifi’s local ip addresses from ap if you have many opposite settings.(Noticed by filling it wrong)</p>
-<h3 id="ssh-settings"><a href="#ssh-settings" class="headerlink" title="ssh settings"></a>ssh settings</h3><p>For not using another keyboard and monitor to deal with raspberry pi, remote control is necessary.</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo apt install openssh-server</span><br></pre></td></tr></table></figure>
-<p>And you may want to change the config of ssh server. Making your wishes at ==/etc/ssh/sshd_config==<br>Remember to restart ssh service to apply the settings.</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sudo service ssh restart</span><br><span class="line"><span class="meta">#</span><span class="bash">or</span></span><br><span class="line">/etc/init.d/ssh restart</span><br></pre></td></tr></table></figure>
-<h4 id="ssh-public-key-login-no-password"><a href="#ssh-public-key-login-no-password" class="headerlink" title="ssh public key login(no password)"></a>ssh public key login(no password)</h4><p>In order to use remote ssh system, there must be two computers: Server and Client. Client should provide his public key for Server and use his private key when login to Server.<br>Client can generate a rsa key by ==ssh-keygen== command, and put his key at ==~/.ssh/authorized_keys==. Notice that authorized_keys is actually a text document.<br>P.S. There are some safety update about openssh-server. If it doesn’t work with above instructions, you should check if ~/.ssh has modify authority of at least 700, ~/.ssh/authorized_keys has 600, and have ~/.ssh can only modified by the actual user by using:</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo chown $USER:$USER ~/.ssh -R==</span><br></pre></td></tr></table></figure>
-
-
+          <h2 id="raspberry-pi-4-os-reconstruction"><a href="#raspberry-pi-4-os-reconstruction" class="headerlink" title="raspberry pi 4 os reconstruction"></a>raspberry pi 4 os reconstruction</h2><p>In view of the raspberry pi is getting slower and also there are lots of files and apps from the last person who uses this pi before me, I decided to rebuild the os and start to try some features of pi, though there are small things stucked me in.<br>I have some ideas to do with pi, like also deploy my blog on my pi as a server and at the same time I could try building my own DNS server. I’m kinda new in this area, it’s time to practice networking. After this, maybe I’ll do NAS or similar network filesystem for convenience and practicing. </p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/Hexo-Blog/2021/05/21/diary20210521/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
